@@ -1,0 +1,22 @@
+{
+    "configurations": [
+        {
+            "name": "AVR-XC8",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "C:/Program Files/Microchip/xc8/v2.31/avr/include"
+            ],
+            "compilerPath": "C:/Program Files/Microchip/xc8/v2.31/avr/bin/avr-gcc.exe",
+            "cStandard": "c11",
+            "intelliSenseMode": "gcc-x86",
+            "defines": [
+                "__AVR_ATmega8A__",
+                "F_CPU=4000000UL"
+            ],
+            "compilerArgs": [
+                "-mmcu=atmega8a"
+            ]
+        }
+    ],
+    "version": 4
+}

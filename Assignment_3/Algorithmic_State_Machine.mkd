@@ -1,0 +1,55 @@
+```mermaid
+flowchart TD
+
+    %% -------------------------------------
+    %% 1. THE MAIN SUPERLOOP
+    %% -------------------------------------
+    Start1[STATE: IDLE]
+    
+    %% Event 1: 500ms ADC Trigger
+    CheckADC_Timer{tick - last_adc >= 500?}
+    UpdateADC_Timer(last_adc = tick <br> Start ADC)
+    
+    %% Event 2: ADC Data Processing
+    CheckADC_Flag{adc_ready == 1?}
+    ProcessADC(adc_ready = 0 <br> Calc Light % <br> Calc PWM % <br> Update PWM Hardware)
+    
+    %% Event 3: 2000ms USART Trigger
+    CheckUSART_Timer{tick - last_usart >= 2000?}
+    UpdateUSART_Timer(last_usart = tick <br> TX USART Strings)
+
+    %% Connect the Main Loop Flow
+    Start1 --> CheckADC_Timer
+    
+    CheckADC_Timer -- True --> UpdateADC_Timer
+    CheckADC_Timer -- False --> CheckADC_Flag
+    UpdateADC_Timer --> CheckADC_Flag
+    
+    CheckADC_Flag -- True --> ProcessADC
+    CheckADC_Flag -- False --> CheckUSART_Timer
+    ProcessADC --> CheckUSART_Timer
+    
+    CheckUSART_Timer -- True --> UpdateUSART_Timer
+    CheckUSART_Timer -- False --> Start1
+    UpdateUSART_Timer --> Start1
+
+    %% -------------------------------------
+    %% 2. TIMER 1 ISR (1ms Heartbeat)
+    %% -------------------------------------
+    Start2[STATE: TIMER1_ISR]
+    Increase_Tick(system_tick++)
+    End_ISR1([RETI: Return to Main])
+
+    Start2 --> Increase_Tick
+    Increase_Tick --> End_ISR1
+    
+    %% -------------------------------------
+    %% 3. ADC ISR (Data Reader)
+    %% -------------------------------------
+    Start3[STATE: ADC_ISR]
+    Process_ISR_ADC(adc_value = ADCW <br> adc_ready = 1)
+    End_ISR2([RETI: Return to Main])
+
+    Start3 --> Process_ISR_ADC
+    Process_ISR_ADC --> End_ISR2
+```
