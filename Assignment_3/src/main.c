@@ -26,7 +26,7 @@ int main(void) {
     // 3. The Event-Driven Superloop
     while(1) {
         
-        // --- EVENT 1: Trigger ADC every 100 ms ---
+        // --- EVENT 1: Trigger ADC every 10 ms ---
         if ((system_tick - last_adc_task) >= 100) {
             last_adc_task = system_tick; 
             adc_start_conversion(); 
@@ -47,7 +47,7 @@ int main(void) {
             pwm_set_duty(pwm_duty_percent);
         }
         
-        // --- EVENT 3: Transmit data periodically (every 500 ms) ---
+        // --- EVENT 3: Transmit data periodically (every 2000 ms) ---
         if ((system_tick - last_usart_task) >= 500) {
             last_usart_task = system_tick;
             
