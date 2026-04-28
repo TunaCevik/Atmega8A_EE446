@@ -1,0 +1,21 @@
+* Timer:
+  * Timer 1 normal mode
+  * Addjust prescaler to get 1ms
+  * Enable interrupts to get interrupt every 1ms
+
+## 2. Syntax Legend
+### **1. Syntax Legend (Version 3.0)**
+* `_hw_` : Hardware action (Automatic), Interface etc.
+* `_sw_` : Software action (Your C code)
+* `_init_` : Setup phase
+* `_isr_` : Interrupt Service Routine
+* `_while_`: Main loop
+* `(:)` : Trigger ("When this happens...")
+* `->` : Chronological flow ("...leads to this")
+* `==` : Is the register/bit are set. State check (`ADDR == 1`)
+* `=` : Set the register/bit.
+* `⌛C` : Controller waits for, `⌛I`: Interface waits for
+* `AND` / `OR` : Logical combinations
+
+#### **Initialization Sequence**
+1. 

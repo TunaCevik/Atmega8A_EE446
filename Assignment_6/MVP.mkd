@@ -1,0 +1,54 @@
+1. Read & Decide: You filter out the 90% of the reference manual you don't need.
+
+ATMEGA8A
+* Timer:
+  * MVP:
+    * Timer 1 normal mode
+    * Addjust prescaler to get 1ms
+    * Enable interrupts to get interrupt every 1ms
+  * Would be good:
+    * Two Independent Output Compare Units
+    * Two Independent Output Compare Units
+    * One Input Capture Unit
+    * Clear Timer on Compare Match (Auto Reload)
+    * Glitch-free, Phase Correct Pulse Width Modulator (PWM)
+    * External Event Counter
+    * Four Independent Interrupt Sources (TOV1, OCF1A, OCF1B, and ICF1)
+
+
+* ADC:
+  * Single Conversion Mode
+  * 10 bit resolution
+  * Interrupt on ADC Conversion Complete
+  * COnfigure prescaler to adjust
+    * Conversion time (13us - 260us)
+    * Resolution max (15kSPS)
+  * Select Vref as a 5V
+  * Implement a digital filter to reduce waviness in the ADC signal. (EMA, SMA)
+
+
+* USART:
+  * Asynchronous operation
+  * 9600 Baud Rate
+  * 8 data bit 1 stop bit
+  * Three Separate Interrupts on TX Complete, TX Data Register Empty and RX Complete
+  * Multi-processor Communication Mode
+  * Double Speed Asynchronous Communication Mode
+  * Enable Interrupts
+
+* I2C:
+  * MVP:
+    * Master
+    * Transmitter
+    * 7 bit address mode
+    * SCL: 100kHz SM
+    * Enable Interrupts
+
+  * Would be good:
+    * Adding slave and adjusting slave address
+    * Adding receiver
+    * Multi-master Arbitration Support
+
+
+* Would be good SPI:
+   * Flashing program by spi using smt32f446re
