@@ -1,0 +1,60 @@
+* I2C:
+  * MVP:
+    * Master
+    * Transmitter
+    * 7 bit address mode
+    * SCL: 100kHz SM
+    * Enable Interrupts
+
+  * Would be good:
+    * Adding slave and adjusting slave address
+    * Adding receiver
+    * Multi-master Arbitration Support
+
+
+### **1. Syntax Legend (Version 3.0)**
+* `_hw.i_`, `_hw.c_` : Hardware action (Automatic), Interface etc.
+* `_sw_` : Software action (Your C code)
+* `_init_` : Setup phase
+* `_isr_` : Interrupt Service Routine
+* `_while_`: Main loop
+* `(:)` : Trigger ("When this happens...")
+* `->` : Chronological flow ("...leads to this")
+* `==` : Is the register/bit are set. State check (`ADDR == 1`)
+* `=` : Set the register/bit.
+* `⌛C` : Controller waits for, `⌛I`: Interface waits for
+* `AND` / `OR` : Logical combinations
+* xxx, : comment
+* xxx , xxx : both
+
+### I2C MASTER
+### **Intialization Sequence**
+1. `_init_ WRITE ( TWBR , TWSR: TWPS )`, Adjusting SCL frequency to 100Khz
+2. `_main_ WRITE(SEI())`
+
+### **TWINT Flag is set**
+* (Send Start/Repeated Start condition) `->` `_hw_ TWINT = 1`
+* (Send SLA+R/W) `->` `_hw_ TWINT = 1`
+* (Send Address Byte) `->` `_hw_ TWINT = 1`
+* (Lost arbitration) `->` `_hw_ TWINT = 1`
+* (TWI has been adddressed by own slave address or general call) `->` `_hw_ TWINT = 1`
+* (TWI has received a data byte) `->` `_hw_ TWINT = 1`
+* (After a STOP or REPEATED START has been received while still addressed as a Slave) `->` `_hw_ TWINT = 1`
+
+### **Using the Interrupt Method**
+
+### **Master Transmitter Mode**
+1. `_sw_ WRITE (TWCR:  CLEAR TWINT = 1 , TWSTA = 1 , TWEN = 1, TWIE = 1)` `(:)` `⌛I` The TWI will generate START as soon as bus is free , Interrupt Generated `IF TWIE == 1 AND SEI()` `->` (START CONDITION TRANSMITTED) `(:)` `_hw_ SET (TWINT = 1)` 
+2. ENTER MT Mode `IF _sw_ TWDR = SLA + W` `->` `_sw_ CLEAR (TWINT = 1)` `->` (SLA+W Transmitted AND ACK Received) `(:)` `_hw_ SET (TWINT = 1) , NUMBER of Status Coes in TWSR possible` `->` (SLA+W has beed sucessfully transmitted, DATA should be transmit) `->` `IF (_hw_ SET TWINT == 1) _sw_ WRITE (TWDR = DATA)` `ELSE _hw_ SET (TWCR: TWWC = 1)` `->` (UPDATED TWDR) `->` `_sw_ CLEAR (TWINT = 1)` 
+
+2. (Session is done) `->` RESTART or STOP Condition generation `->`  TWCR 
+
+### **Master Receiver Mode**
+1. `_sw_ WRITE (TWCR:  CLEAR TWINT = 1 , TWSTA = 1 , TWEN = 1)` `(:)` `⌛I` The TWI will generate START as soon as bus is free , Interrupt Generated `IF TWIE == 1 AND SEI()`  `->` (START CONDITION TRANSMITTED) `(:)` `_hw_ SET (TWINT = 1)` 
+2.  ENTER MR Mode `IF _sw_ TWDR = SLA + W` `->` `_sw_ CLEAR (TWINT = 1)` `->` (SLA+R Transmitter AND ACK Received) `(:)` `_hw_ SET (TWINT = 1) , NUMBER of Status Coes in TWSR possible` `->` (DATA RECEIVED) , `IF (_hw_ SET TWINT == 1) _sw_ READ (TWDR = DATA)` `->` (AFTER the last byte has been received) `->` `_sw_ TWCR : WRITE (TWINT = 1 , TWSTO = 1 , TWEN = 1)`
+ 
+2. (Session is done) `->` RESTART or STOP Condition generation `->` TWCR
+
+### **Slave Receiver Mode**
+
+ 

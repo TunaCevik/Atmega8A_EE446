@@ -1,0 +1,31 @@
+## 2. Syntax Legend
+### **1. Syntax Legend (Version 3.0)**
+* `_hw.i_` : Hardware action (Automatic), Interface etc.
+* `_sw_` : Software action (Your C code)
+* `_init_` : Setup phase
+* `_isr_` : Interrupt Service Routine
+* `_while_`: Main loop
+* `(:)` : Trigger ("When this happens...")
+* `->` : Chronological flow ("...leads to this")
+* `==` : Is the register/bit are set. State check (`ADDR == 1`)
+* `=` : Set the register/bit.
+* `⌛C` : Controller waits for, `⌛I`: Interface waits for
+* `AND` / `OR` : Logical combinations
+
+### **ADC Single Conversion Mode**
+
+#### **Initialization Sequence**
+1. `_init_ WRITE ( ADMUX = (1 << REFS0) | (1 << MUX0) )`, Adjusting REF and MUX0 before enabling ADC
+2. `_init_ WRITE ( ADCSRA = (1 << ADEN) | (1 << ADIE) | (1 << ADPS2) | (1 << ADPS0) )`, Adjusting PS APSx to get 50kHz and 200kHz range for 10 bit mode, ADEN: ADC enable,
+  * Interrupt generated `IF _init_ (ADIE == 1)`
+
+### **Adjusting ADMUX**
+*  BEFORE first 2 cycles AND (`_sw_ WRITE (ADMUX = NEW Config)`) `(:)` `_hw.adc_ Configure it self to before starting new conversion`
+* AFTER first 2 cycles `->` (`_sw_ WRITE (ADMUX = NEW Config)`) `(:)` `⌛I _hw_ (ADSC = 0)` `->` Start conversion based on new ADMUX
+
+### **ADCL and ACH - The ADC Data Register**
+* (ADC conversion complete) `(:)` `_hw_ (ADCL = DATA), (ADCH = DATA)` `->` `_sw_ READ (ADCH)` `(:)` `_hw_ (ADC[9:0] = DATA)`
+  * `_sw_ READ (ADCL)` `->` `_sw_ READ (ADCH)`, First read ADCL and then ADCH because ADCH trigger
+
+### **Conversion**
+1. (ADC conversion started) `(:)` `IF` Conversion is first conversion `->` `⌛C 25 ADC Clock cycles` `:` `⌛C 13 ADC Clock cycles` `->` `_hw_ (ADSC = 1) AND _hw_ ADCL = DATA AND _hw_ ADCH = DATA` `AND` Interrupt generated `IF _init_ ADIE == 1` `->` `STATE ADC IDLE`
