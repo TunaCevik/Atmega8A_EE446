@@ -22,7 +22,9 @@ OBJS = $(BUILD_DIR)/adc.o \
        $(BUILD_DIR)/lcd.o \
        $(BUILD_DIR)/main.o \
        $(BUILD_DIR)/timer.o \
-       $(BUILD_DIR)/usart.o 
+       $(BUILD_DIR)/usart.o \
+	   $(BUILD_DIR)/pcf8574.o \
+	   $(BUILD_DIR)/INT0.o
 	   
 
 # Default Target: Generates the .hex file for the programmer
